@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <title>TradeBuddy</title>
+
+        <!-- include jquery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <!-- include bootstrap -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+        <!-- include firebase -->
+        <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-database.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-functions.js"></script>
+        <script>
+          // Initialize Firebase
+          var config = {
+            apiKey: "AIzaSyCDgL81SsjFkBW4wxQ7syb_Uo5Y6igc5Gg",
+            authDomain: "tradebuddy-f803c.firebaseapp.com",
+            databaseURL: "https://tradebuddy-f803c.firebaseio.com",
+            projectId: "tradebuddy-f803c",
+            storageBucket: "tradebuddy-f803c.appspot.com",
+            messagingSenderId: "1059763930646"
+          };
+          firebase.initializeApp(config);
+        </script>
+        
+        <link rel="stylesheet" type="text/css" href="stylesheet.css">
+
+    </head>
+    
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="https://www.bmtrading.de" target="_blank"><img src="logo_bmtrading.png" width="40px"></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Trades <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Analytics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Settings</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        
+        <div id="trades_ui" class="main_ui"></div>
+        <script src="trades.js"></script>
+        
+        <div id="analytics_ui">
+            <div class="row">
+                <div class="col">Net Profit</div>
+                <div class="col">col</div>
+                <div class="col">Gross Profit</div>
+                <div class="col">col</div>
+                <div class="col">Gross Loss</div>
+                <div class="col">col</div>
+            </div>
+            <div class="row">
+                <div class="col">Profit Factor</div>
+                <div class="col">col</div>
+                <div class="col">Expected Profit</div>
+                <div class="col">col</div>
+                <div class="col"></div>
+                <div class="col">col</div>
+            </div>
+            <div class="row">
+                <div class="col">Trades</div>
+                <div class="col">col</div>
+                <div class="col">Max Drawdown</div>
+                <div class="col">col</div>
+                <div class="col">Max Drawdown %</div>
+                <div class="col">col</div>
+            </div>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col">col</div>
+                <div class="col">Sell Trades (won)</div>
+                <div class="col">col</div>
+                <div class="col">Buy Trade (won)</div>
+                <div class="col">col</div>
+            </div>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col">col</div>
+                <div class="col">Positive Trades (%)</div>
+                <div class="col">col</div>
+                <div class="col">Negative Trades (%)</div>
+                <div class="col">col</div>
+            </div>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col">Biggest</div>
+                <div class="col">Profit</div>
+                <div class="col">col</div>
+                <div class="col">Loss</div>
+                <div class="col">col</div>
+            </div>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col">Avg</div>
+                <div class="col">Profit</div>
+                <div class="col">col</div>
+                <div class="col">Loss</div>
+                <div class="col">col</div>
+            </div>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col">Max</div>
+                <div class="col">Wins in a Row</div>
+                <div class="col">col</div>
+                <div class="col">Losses in a Row</div>
+                <div class="col">col</div>
+            </div>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col">Max</div>
+                <div class="col">Profit in a Row</div>
+                <div class="col">col</div>
+                <div class="col">Loss in a Row</div>
+                <div class="col">col</div>
+            </div>
+        </div>
+    </body>
+</html>
