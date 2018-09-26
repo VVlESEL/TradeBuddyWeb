@@ -316,6 +316,7 @@ async function showGraph() {
             labels: dates,
             datasets: [{
                 data: points,
+                label: "Equity",
                 borderColor: '#fe8b36',
                 fill: false,
             }],            
