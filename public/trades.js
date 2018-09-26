@@ -7,16 +7,24 @@ var ref;
 //holds the current account
 var currentAccount;
 
+    firebase.auth().signInWithEmailAndPassword("test@test.de", "test12345").then(function() {
+        console.log("Singed In");
+        $("#email").val("");
+        $("#password").val("");
+    }, function(error) {
+        alert(error.message);
+    });    
+
 firebase.auth().onAuthStateChanged(async function(userData) {
     if (userData) {
-        console.log(userData);
+        user = userData;
+        console.log(user);
         
         //update login/logout form
         $("#email-label").text(user.email);
         $("#form-logged-in").css("display", "block");
         $("#form-logged-out").css("display", "none");
         
-        user = userData;
         //get a reference to the users db entry
         ref = firebase.database().ref("/user/"+user.uid);
         //get the current account of the user
@@ -36,6 +44,7 @@ firebase.auth().onAuthStateChanged(async function(userData) {
         });
         //show numbers
         await calculateNumbers();
+        await showGraph();
         
         //show content
         $("#content").css("display", "block");
@@ -283,6 +292,106 @@ async function calculateNumbers() {
     $("#max-loss").html(maxLossRowMoney.toFixed(2));
 }
 
+async function showGraph() {
+    //build data points array with time and equity
+    var points = [];
+    var dates = [];
+    var equity = 0;
+    for(var i = trades.length-1; i >=0; i--){
+        var t = trades[i];
+        equity += t.profit + t.commission + t.swap;
+        var date = new Date(t.closetime.substring(0,4), 
+                        t.closetime.substring(5,7), 
+                        t.closetime.substring(8,10),
+                        t.closetime.substring(11,13),
+                        t.closetime.substring(14,16)                       
+                       );
+        points.push(equity.toFixed(2));
+        dates.push(date.toLocaleString());
+    }
+    
+    new Chart(document.getElementById("chart-container").getContext("2d"), {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                data: points,
+                borderColor: '#fe8b36',
+                fill: false,
+            }],            
+        },
+        options: {
+            tooltips: {
+                callbacks: {
+                    title: function(tooltipItem, data) {
+                        return dates[tooltipItem[0].index];
+                    },
+                    label: function(tooltipItem, data) {
+                        return tooltipItem.yLabel.toFixed(2) + " €";
+                    }
+                }
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return "€ " + value;
+                        }
+                    }
+                }],
+                xAxes: [{
+                    display: true,
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return value.split(",")[0];
+                        },
+                        maxTicksLimit: 20,
+                    }
+                }],
+            },
+        }
+    });
+}
+/*
+    //build data points array with time and equity
+    var points = [];
+    var equity = 0;
+    for(var i = trades.length-1; i >=0; i--){
+        var t = trades[i];
+        equity += t.profit + t.commission + t.swap;
+        points.push({
+            x: new Date(t.closetime.substring(0,4), 
+                        t.closetime.substring(5,7), 
+                        t.closetime.substring(8,10),
+                        t.closetime.substring(11,13),
+                        t.closetime.substring(14,16)                       
+                       ), 
+            y: equity
+        });
+    }
+      
+    var options = {
+        animationEnabled: true,  
+        axisX: {
+            valueFormatString: "MMM"
+        },
+        axisY: {
+            prefix: "€",
+            includeZero: false,
+            valueFormatString: "#.##"
+        },
+        data: [{
+            yValueFormatString: "€#.##",
+            xValueFormatString: "YYYY-MM-DD HH:MM",
+            type: "spline",
+            dataPoints: points
+        }]
+    };
+    $("#chart-container").CanvasJSChart(options);
+}
+
+*/
+
 async function resetNumbers() {
     //update ui
     $("#net-profit").html("");
@@ -313,109 +422,4 @@ async function resetNumbers() {
    
     $("#max-profit").html("");
     $("#max-loss").html("");
-}
-
-var filter = {};
-    refFilter = ref.child(user.uid+"/settings/accounts/"+currentAccount+"/filter");
-    filter = await (refFilter.once("value")).val();
-
-    //update buy and sell filter
-    if (filter == null || filter["buy"] == null) {
-      refFilter.update({
-        "buy": true,
-      });
-    }
-    if (filter == null || filter["sell"] == null) {
-      refFilter.update({
-        "sell": true,
-      });
-    }
-
-    //update strategies filter
-    if (filter == null ||
-        filter["strategies"] == null ||
-        filter["strategies"]["*"] == null) {
-      refFilter.child("strategies").update({
-        "*": true,
-      });
-    }
-
-    SettingsController.strategies.values.forEach((strategy) {
-      if (filter == null ||
-          filter["strategies"] == null ||
-          filter["strategies"][strategy] == null)
-        refFilter.child("strategies").update({
-          strategy: true,
-        });
-    });
-
-    if(filter != null) {
-      filter["strategies"]?.forEach((k, v) {
-        if (k != "*" && !SettingsController.strategies.containsValue(k)) {
-          refFilter.child("strategies").update({
-            k: null,
-          });
-        }
-      });
-    }
-
-    //update symbols filter
-    if (filter == null ||
-        filter["symbols"] == null ||
-        filter["symbols"]["*"] == null) {
-      refFilter.child("symbols").update({
-        "*": true,
-      });
-    }
-
-    SettingsController.symbols.keys.forEach((symbol) {
-      if (filter == null ||
-          filter["symbols"] == null ||
-          filter["symbols"][symbol] == null)
-        refFilter.child("symbols").update({
-          symbol: true,
-        });
-    });
-
-    if(filter != null) {
-      filter["symbols"]?.forEach((k, v) {
-        if (k != "*" && !SettingsController.symbols.containsKey(k)) {
-          refFilter.child("symbols").update({
-            k: null,
-          });
-        }
-      });
-    }
-
-    await updateFilter();
-  }
-
-
-  static Future<void> updateGeneral({bool buy, bool sell}) async {
-    //update buy and sell filter
-    if (buy != null && filter != null) {
-      refFilter.update({
-        "buy": buy,
-      });
-    }
-    if (sell != null && filter != null) {
-      refFilter.update({
-        "sell": sell,
-      });
-    }
-  }
-  static Future<void> updateStrategies(Map symbols) async {
-    symbols.forEach((k,v) async {
-        refFilter.child("strategies").update({
-          k: v,
-        });
-    });
-  }
-  static Future<void> updateSymbols(Map strategies) async {
-    strategies.forEach((k,v) async {
-      refFilter.child("symbols").update({
-        k: v,
-      });
-    });
-  }
 }
